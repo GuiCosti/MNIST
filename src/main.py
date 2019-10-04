@@ -7,13 +7,18 @@ Main class to execute the neural networks and test.
 # Files
 import neural_network
 import mnist_loader
+import support_vector_machine as svm
 
 def main():
-    fnn_single_hidden_layer(30, 30, 10, 3.0, False)
+    ### FNN (SGD) Tests ###
+    fnn_single_hidden_layer(30, 30, 10, 3.0, True)
+
+    ### SVM Tests ###
+    #  svm.svm_baseline()
 
 # SGD Tests
 def fnn_single_hidden_layer(hidden_neurons, epochs, mini_batch_size, learning_rate, training_feedback):
-    """Feedforward neural network using stochastic gradient descent"""
+    """Feedforward neural network using stochastic gradient descent."""
 
     # Loads traninig data   
     training_data, validation_data, test_data = mnist_loader.load_data() 
