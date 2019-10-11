@@ -2,7 +2,7 @@
 network_network.py
 ~~~~~~~~~~
 A module to implement the stochastic gradient descent learning
-algorithm for a feedforward neural network.  Gradients are calculated
+algorithm for a feedforward neural network (FNN). Gradients are calculated
 using backpropagation.
 """
 
@@ -75,7 +75,7 @@ class Network(object):
         new_biases = [np.zeros(b.shape) for b in self.biases] # Creates a new empty vector store the new biases values
         new_weights = [np.zeros(w.shape) for w in self.weights] # Creates a new empty vector store the new weights values
         for x, y in mini_batch: # Iterate over values in this mini-batch
-            delta_b, delta_w = self.backprop(x, y) # Apply the backpropagation logic to get ΔC
+            delta_b, delta_w = self.backprop(x, y) # Apply the backpropagation to figure out the partial derivatives for biases (b) and weights (w) at the point C.
             new_biases = [nb+dnb for nb, dnb in zip(new_biases, delta_b)]
             new_weights = [nw+dnw for nw, dnw in zip(new_weights, delta_w)]
         self.weights = [w - (learning_rate/len(mini_batch)) * nw # Apply the rule to move the weights to the local minimum (v -> v' = v - η∇C)
@@ -111,7 +111,7 @@ class Network(object):
         # scheme in the book, used here to take advantage of the fact
         # that Python can use negative indices in lists.
         for l in range(2, self.num_layers):
-            z = zs[-l]
+            z = zs[-l] # Uses a feature from Python to access the list backward. ex: l[-3] is the third last entry in a list l
             sp = sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             new_biases[-l] = delta
