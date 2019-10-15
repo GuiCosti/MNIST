@@ -12,8 +12,8 @@ from constant import Training_Dataset
 
 def main():
     ### FNN (SGD) Tests ###
-    fnn_single_hidden_layer(30, 30, 10, 3.0, True, Training_Dataset.Test_Data)
-
+    fnn_single_hidden_layer(30, 30, 10, 3.0, True, Training_Dataset.Test_Data) 
+    fnn_single_hidden_layer(30, 30, 10, 3.0, True, Training_Dataset.Validation_Data) # validation_data contains 10,000 images of digits, different from the 50,000 images in the MNIST training set, and  MNIST test set (prevent overfitting)
 
     ### SVM Tests ###
     #  svm.svm_baseline()

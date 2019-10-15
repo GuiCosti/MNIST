@@ -131,7 +131,7 @@ class Network(object):
         """Return the vector of partial derivatives \\partial C_x \\partial a for the output activations."""
         return (output_activations-y)
 
-#### Misc Functions
+### Misc Functions
 def sigmoid(z):
     """The sigmoid function. It's smooth the neuron result
     to create small changes on the output. Instead of being

@@ -23,7 +23,3 @@ def svm_baseline():
     num_correct = sum(int(a == y) for a, y in zip(predictions, test_data[1]))
     print ("Baseline classifier using an SVM.")
     print (F"{num_correct} of {len(test_data[1])} values correct.")
-
-if __name__ == "__main__":
-    svm_baseline()
-    
