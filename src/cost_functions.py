@@ -32,14 +32,12 @@ class CrossEntropyCost(object):
     neurons"""
     @staticmethod
     def fn(a, y):
-        """Return the cost associated with an output ``a`` and desired output
-        ``y``.  Note that np.nan_to_num is used to ensure numerical
-        stability.  In particular, if both ``a`` and ``y`` have a 1.0
+        """Return the cost associated with an output 'a' and desired output
+        'y'.  Note that np.nan_to_num is used to ensure numerical
+        stability. In particular, if both 'a' and 'y' have a 1.0
         in the same slot, then the expression (1-y)*np.log(1-a)
         returns nan.  The np.nan_to_num ensures that that is converted
-        to the correct value (0.0).
-
-        """
+        to the correct value (0.0)."""
         return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
 
 def sigmoid(z):
