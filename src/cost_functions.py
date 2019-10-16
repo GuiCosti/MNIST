@@ -14,6 +14,7 @@ class QuadraticCost(object):
     too far from it should be) the function learns much more slowly. This is because of the sigmoid 
     function, and it's graph shows us that when the artificial neuron is badly wrong, it has a lot of
     difficulty on learning."""
+
     @staticmethod
     def fn(a, y):
         """Return the cost associated with an output 'a' and desired output 'y'."""
@@ -30,6 +31,7 @@ class CrossEntropyCost(object):
     nearly on the expected result. When should we use the cross-entropy instead of the quadratic cost?
     In fact, the cross-entropy is nearly always the better choice, provided the output neurons are sigmoid
     neurons"""
+
     @staticmethod
     def fn(a, y):
         """Return the cost associated with an output 'a' and desired output
@@ -39,6 +41,14 @@ class CrossEntropyCost(object):
         returns nan.  The np.nan_to_num ensures that that is converted
         to the correct value (0.0)."""
         return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
+    
+    @staticmethod
+    def delta(z, a, y):
+        """Return the error delta from the output layer.  Note that the
+        parameter ``z`` is not used by the method.  It is included in
+        the method's parameters in order to make the interface
+        consistent with the delta method for other cost classes."""
+        return (a-y)
 
 def sigmoid(z):
     """The sigmoid function."""

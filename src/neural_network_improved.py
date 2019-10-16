@@ -18,6 +18,7 @@ import numpy as np
 
 # Files
 import cost_functions as cf
+import constant
 
 class Improved_Network(object):
     
@@ -65,7 +66,7 @@ class Improved_Network(object):
             a = cf.sigmoid(np.dot(w, a)+b)
         return a
 
-    def SGD(self,
+    def stochastic_gradient_descent(self,
             training_data,
             epochs,
             mini_batch_size,
@@ -96,6 +97,8 @@ class Improved_Network(object):
         evaluation data at the end of each epoch. Note that the lists
         are empty if the corresponding flag is not set."""
 
+        training_data, evaluation_data = convert_zip_data(training_data, evaluation_data) # Fixing python 3 problem with zip returning object
+
         if evaluation_data: n_data = len(evaluation_data) # check if exists an evaluation_data.
         n = len(training_data) # attribute the length of training data to n.
         evaluation_cost, evaluation_accuracy = [], [] # create 2 arrays to hold evaluation cost and accuracy
@@ -120,7 +123,7 @@ class Improved_Network(object):
             if monitor_training_accuracy:
                 accuracy = self.accuracy(training_data, convert=True)
                 training_accuracy.append(accuracy)
-                print (F"Accuracy on training data: {accuracy} / {n}")
+                print (F"Accuracy on training data: {accuracy} / {n} (" + "{:.1%}".format(accuracy/n) + ")")
 
             if monitor_evaluation_cost:
                 cost = self.total_cost(evaluation_data, lmbda, convert=True)
@@ -130,7 +133,7 @@ class Improved_Network(object):
             if monitor_evaluation_accuracy:
                 accuracy = self.accuracy(evaluation_data)
                 evaluation_accuracy.append(accuracy)
-                print (F"Accuracy on evaluation data: {self.accuracy(evaluation_data)} / {n_data}")
+                print (F"Accuracy on evaluation data: {self.accuracy(evaluation_data)} / {n_data} (" + "{:.1%}".format(accuracy/n_data) + ")")
             print
         return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
 
@@ -235,7 +238,7 @@ class Improved_Network(object):
         return sum(int(x == y) for (x, y) in results)
 
 
-    ### Misc Functions
+### Misc Functions
 
     def save(self, filename):
         """Save the neural network to the file 'filename'."""
@@ -268,4 +271,15 @@ def vectorize_to_ten_dimension(digit):
     e = np.zeros((10, 1)) # generates a 10-dimensional numpy.ndarray with 0's. The parameters of np.zeros are (number of rows, number of columns)
     e[digit] = 1.0 # set the answer on 10-dimensional array
     return e
-    
+
+def convert_zip_data(training_data, test_data):
+    training_data = extract_zip_list(training_data)
+    test_data = extract_zip_list(test_data)
+    return (training_data, test_data)
+
+def extract_zip_list(obj):
+    """In Python 2, zip returned a list. In Python 3, zip returns an iterable object.
+    But you can make it into a list just by calling list. This method do this."""
+    if(str(type(obj)) == constant.ZIP_TYPE):
+        return list(obj)
+    return obj
