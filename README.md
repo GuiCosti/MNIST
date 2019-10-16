@@ -1,12 +1,12 @@
 ## About
-Tests deep leaning algorithms over MNIST handwritten digits database, using Python 3.7.4.
+Apply deep leaning algorithms over MNIST handwritten digits database, using Python 3.
 
 ## Requirements
-- python
-- numpy
-- scikit-learn
-- scipy
-- matplotlib
+- python (3.7.4)
+- numpy (1.17.2)
+- scikit-learn (0.21.3)
+- scipy (1.3.1)
+- matplotlib (3.1.1)
 
 ## Base Sites
 - [Neural Network Sand Deep Learning](http://neuralnetworksanddeeplearning.com/)

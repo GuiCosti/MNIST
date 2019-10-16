@@ -56,7 +56,8 @@ class Improved_Network(object):
         layers."""
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]] # biases of each layer (Note that the Network initialization code assumes that the first layer of neurons is an input layer, and omits to set any biases for those neurons)
         self.weights = [np.random.randn(y, x)/np.sqrt(x)
-                        for x, y in zip(self.sizes[:-1], self.sizes[1:])] # Strategy 1/sqrt(n) - '[:-1]' slices the string to omit the last character. '[1:]' slices the string to omit the first character.
+                        for x, y in zip(self.sizes[:-1], self.sizes[1:])] # strategy: 1/sqrt(Number of inputs) - 
+                        #'[:-1]' slices the string to omit the last character. '[1:]' slices the string to omit the first character.
 
     def feedforward(self, a):
         """Return the output of the network if 'a' is input."""
@@ -100,12 +101,12 @@ class Improved_Network(object):
         evaluation_cost, evaluation_accuracy = [], [] # create 2 arrays to hold evaluation cost and accuracy
         training_cost, training_accuracy = [], [] # create 2 arrays to hold training cost and accuracy
 
-        for j in range(epochs): # Iterate over the epochs
+        for j in range(epochs): # iterate over the epochs
 
-            random.shuffle(training_data) # Shuffle the training data to avoid biases on networking training
+            random.shuffle(training_data) # shuffle the training data to avoid biases on networking training
             mini_batches = [
                 training_data[k:k+mini_batch_size]
-                for k in range(0, n, mini_batch_size)] # Creates the mini-batches based on mini_batch_size, from the training_data
+                for k in range(0, n, mini_batch_size)] # creates the mini-batches based on mini_batch_size, from the training_data
 
             for mini_batch in mini_batches: # iterate over the mini-batches
                 self.update_mini_batch(mini_batch, learning_rate, lmbda, len(training_data)) # update the current mini-batch weights and biases based on learning rate
@@ -120,10 +121,12 @@ class Improved_Network(object):
                 accuracy = self.accuracy(training_data, convert=True)
                 training_accuracy.append(accuracy)
                 print (F"Accuracy on training data: {accuracy} / {n}")
+
             if monitor_evaluation_cost:
                 cost = self.total_cost(evaluation_data, lmbda, convert=True)
                 evaluation_cost.append(cost)
                 print (F"Cost on evaluation data: {cost}")
+
             if monitor_evaluation_accuracy:
                 accuracy = self.accuracy(evaluation_data)
                 evaluation_accuracy.append(accuracy)
@@ -138,46 +141,48 @@ class Improved_Network(object):
         learning rate, 'lmbda' is the regularization parameter, and
         'n' is the total size of the training data set."""
 
-        nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
-        for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
-            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
-            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+        new_biases = [np.zeros(b.shape) for b in self.biases] # creates a new empty vector store the new biases values
+        new_weights = [np.zeros(w.shape) for w in self.weights] # creates a new empty vector store the new weights values
+        for x, y in mini_batch: # iterate mini-batch
+            delta_b, delta_w = self.backprop(x, y) # apply the backpropagation to figure out the difference between partial derivatives for biases (b) and weights (w) at the point C.
+            new_biases = [nb+dnb for nb, dnb in zip(new_biases, delta_b)] 
+            new_weights = [nw+dnw for nw, dnw in zip(new_weights, delta_w)]
         self.weights = [(1-learning_rate*(lmbda/n))*w-(learning_rate/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(learning_rate/len(mini_batch))*nb
-                       for b, nb in zip(self.biases, nabla_b)]
+                        for w, nw in zip(self.weights, new_weights)]  # apply the rule to move the weights to the local minimum, this time using lambda as well (v -> v' = v - η∇C)
+        self.biases = [b-(learning_rate/len(mini_batch))*nb 
+                       for b, nb in zip(self.biases, new_biases)] # apply the rule to move the biases to the local minimum (v -> v' = v - η∇C)
 
     def backprop(self, x, y):
         """Return a tuple '(new_biases, new_weights)' representing the
         gradient for the cost function C_x.  'new_biases' and
         'new_weights' are layer-by-layer lists of numpy arrays, similar
         to 'self.biases' and 'self.weights'."""
+
         new_biases = [np.zeros(b.shape) for b in self.biases]
         new_weights = [np.zeros(w.shape) for w in self.weights]
         # feedforward
         activation = x
-        activations = [x] # list to store all the activations, layer by layer
-        zs = [] # list to store all the z vectors, layer by layer
+        activations = [x] # list to store all the smoothed activations, layer by layer
+        zs = [] # list to store all the z vectors, layer by layer (z = σ(w⋅x+b)), where x is the neuron input; w is the neuron weight; b is the neuron bias and σ is the sigmoid function
+        
         for b, w in zip(self.biases, self.weights):
-            z = np.dot(w, activation)+b
-            zs.append(z)
-            activation = cf.sigmoid(z)
-            activations.append(activation)
+            z = np.dot(w, activation)+b # np.dot() is a matrix multiplication of w⋅x+b -> multiply all inputs for they respective weights and add their biases
+            zs.append(z) # store the result above in Z array
+            activation = cf.sigmoid(z) # set the activation value as sigmoid(z), smoothing activation value
+            activations.append(activation) # add the smoothed activation to the activations array
         # backward pass
-        delta = (self.cost).delta(zs[-1], activations[-1], y)
-        new_biases[-1] = delta
-        new_weights[-1] = np.dot(delta, activations[-2].transpose())
+        delta = (self.cost).delta(zs[-1], activations[-1], y) # apply the Cost Delta Function 
+        new_biases[-1] = delta # update biases with new delta
+        new_weights[-1] = np.dot(delta, activations[-2].transpose()) # updated weights multiplying the activations 
         # Note that the variable l in the loop below is used a little
         # differently to the notation in Chapter 2 of the book.  Here,
         # l = 1 means the last layer of neurons, l = 2 is the
         # second-last layer, and so on.  It's a renumbering of the
         # scheme in the book, used here to take advantage of the fact
         # that Python can use negative indices in lists.
-        for l in range(2, self.num_layers):
-            z = zs[-l]
-            sp = cf.sigmoid_prime(z)
+        for l in range(2, self.num_layers): # iterate over network layers
+            z = zs[-l] # attribute the zs of that layer to z. Uses a feature from Python to access the list backward. ex: l[-3] is the third last entry in a list l
+            sp = cf.sigmoid_prime(z) # finds the prime derivative of the sigmoid function 
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             new_biases[-l] = delta
             new_weights[-l] = np.dot(delta, activations[-l-1].transpose())
@@ -185,44 +190,42 @@ class Improved_Network(object):
 
     ### Monitor Functions
     def total_cost(self, data, lmbda, convert=False):
-        """Return the total cost for the data set ``data``.  The flag
-        ``convert`` should be set to False if the data set is the
+        """Return the total cost for the data set 'data'. The flag
+        'convert' should be set to False if the data set is the
         training data (the usual case), and to True if the data set is
         the validation or test data.  See comments on the similar (but
-        reversed) convention for the ``accuracy`` method, above.
-        """
-        cost = 0.0
-        for x, y in data:
-            a = self.feedforward(x)
-            if convert: y = vectorize_to_ten_dimension(y)
+        reversed) convention for the 'accuracy' method, below."""
+
+        cost = 0.0 
+        for x, y in data: # iterate over the data
+            a = self.feedforward(x) # apply feedforward function over the inputs
+            if convert: y = vectorize_to_ten_dimension(y) # convert a digit (0...9) into a corresponding desired output from the neural network.
             cost += self.cost.fn(a, y)/len(data)
         cost += 0.5*(lmbda/len(data))*sum(
             np.linalg.norm(w)**2 for w in self.weights)
         return cost
     
     def accuracy(self, data, convert=False):
-        """Return the number of inputs in ``data`` for which the neural
+        """Return the number of inputs in 'data' for which the neural
         network outputs the correct result. The neural network's
         output is assumed to be the index of whichever neuron in the
         final layer has the highest activation.
 
-        The flag ``convert`` should be set to False if the data set is
+        The flag 'convert' should be set to False if the data set is
         validation or test data (the usual case), and to True if the
         data set is the training data. The need for this flag arises
-        due to differences in the way the results ``y`` are
-        represented in the different data sets.  In particular, it
+        due to differences in the way the results 'y' are
+        represented in the different data sets. In particular, it
         flags whether we need to convert between the different
-        representations.  It may seem strange to use different
-        representations for the different data sets.  Why not use the
-        same representation for all three data sets?  It's done for
+        representations. It may seem strange to use different
+        representations for the different data sets. Why not use the
+        same representation for all three data sets? It's done for
         efficiency reasons -- the program usually evaluates the cost
         on the training data and the accuracy on other data sets.
         These are different types of computations, and using different
-        representations speeds things up.  More details on the
-        representations can be found in
-        mnist_loader.load_data_wrapper.
+        representations speeds things up. More details on the
+        representations can be found in mnist_loader.load_data()."""
 
-        """
         if convert:
             results = [(np.argmax(self.feedforward(x)), np.argmax(y))
                        for (x, y) in data]
