@@ -14,16 +14,21 @@ from constant import Training_Dataset
 from constant import Cost_Function
 
 def main():
+    """Main function of this project"""
     ### FNN (SGD) Tests ###
     # fnn(30, 30, 10, 3.0, True, Training_Dataset.Test_Data) 
     # fnn(30, 30, 10, 3.0, True, Training_Dataset.Validation_Data) # validation_data contains 10,000 images of digits, different from the 50,000 images in the MNIST training set, and  MNIST test set (prevent overfitting)
 
     ### Improved FNN (Cross-Entropy, L2 Regularization, Weights Initialization) ###
-    improved_fnn(30, 30, 10, 0.1, 5.0, Training_Dataset.Validation_Data, monitor_evaluation_accuracy= True)
-
+    # improved_fnn(30, 30, 10, 0.1, 5.0, Training_Dataset.Validation_Data, monitor_evaluation_accuracy= True)
+    # evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = improved_fnn(30, 30, 10, 0.1, 5.0, Training_Dataset.Validation_Data, True, True, True, True)
 
     ### SVM Tests ###
     #  svm.svm_baseline()
+
+    ### Playground ###
+    
+
 
 # SGD Tests
 def fnn(hidden_neurons, epochs, mini_batch_size, learning_rate, training_feedback, training_dataset_type: Training_Dataset):
@@ -59,7 +64,8 @@ def improved_fnn(hidden_neurons,
                 monitor_training_cost=False,
                 monitor_training_accuracy=False):
     """Improved Feedforward Neural Network using stochastic gradient descent.
-    Improved using Cross-Entropy, L2 Regularization, Weights Initialization technics."""
+    Improved using Cross-Entropy, L2 Regularization, Weights Initialization technics.
+    Note: the lambda is the regularization parameter rate."""
 
     # Loads traninig data   
     training_data, validation_data, test_data = mnist_loader.load_data()
@@ -77,7 +83,7 @@ def improved_fnn(hidden_neurons,
     # Train the network with 'epochs' value epochs, 'mini_batch_size' digits as mini-batch size,
     # 'learning_rate' as learning rate and test feedback if 'training_feedback' is true.
     print_information("Improved FNN", hidden_neurons, epochs, mini_batch_size, learning_rate)
-    net.stochastic_gradient_descent(training_data, 
+    return net.stochastic_gradient_descent(training_data, 
                                     epochs,
                                     mini_batch_size,
                                     learning_rate,
