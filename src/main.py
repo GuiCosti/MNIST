@@ -10,6 +10,7 @@ import neural_network_improved
 import cost_functions as cf
 import mnist_loader
 import support_vector_machine as svm
+from playground import playground
 from constant import Training_Dataset
 from constant import Cost_Function
 
@@ -27,6 +28,7 @@ def main():
     #  svm.svm_baseline()
 
     ### Playground ###
+    playground()
     
 
 
