@@ -22,7 +22,7 @@ def hyper_parameters():
     test_data = list(test_data)
 
 
-    ### Board Strategy ###
+    # Board Strategy
     board_strategy(training_data, validation_data, test_data)
 
 def board_strategy(training_data, validation_data, test_data):
@@ -37,21 +37,31 @@ def board_strategy(training_data, validation_data, test_data):
 
     net = neural_network_improved.Improved_Network([784, 10])
 
-    # Reducing training set to 1.000
-    # net.stochastic_gradient_descent(training_data[:1000],
-    #                                 30,
-    #                                 10,
-    #                                 10.0,
-    #                                 lmbda = 1000.0,
-    #                                 evaluation_data=validation_data[:100],
-    #                                 monitor_evaluation_accuracy=True)
-                                
     # Reducing training set to 1.000 and only 0 and 1 images
-    training_data = list(filter(lambda img: img[1][0] == 1 or img [1][1] == 1, training_data))
+    # reduced_training_set_and_numbers_one_zero(training_data, validation_data, net)
+
+    # Reducing training set to 1.000
+    reduced_training_set(training_data, validation_data, net)
+                                
+
+def reduced_training_set_and_numbers_one_zero(training_data, validation_data, net: neural_network_improved.Improved_Network):
+    """Reduces training set to 1.000 images containing only numbers '0' and '1'."""
+    training_data = list(filter(lambda img: img[1][0] == 1 or img [1][1] == 1, training_data)) # Filter traninig set to contains only "0" and "1" numbers images
+    validation_data = list(filter(lambda img: img[1] == 1 or img [1] == 0, validation_data)) # Filter validations set to contains only "0" and "1" numbers images
     net.stochastic_gradient_descent(training_data[:1000],
                                 30,
-                                10,
-                                10.0,
-                                lmbda = 1000.0,
+                                20,
+                                40.0,
+                                lmbda = 1.0,
                                 evaluation_data=validation_data[:100],
                                 monitor_evaluation_accuracy=True)
+
+def reduced_training_set(training_data, validation_data, net: neural_network_improved.Improved_Network):
+    """Reduces training set to 1.000 images."""
+    net.stochastic_gradient_descent(training_data[:1000],
+                                    30,
+                                    50,
+                                    0.1,
+                                    lmbda=0.1,
+                                    evaluation_data=validation_data[:100],
+                                    monitor_evaluation_accuracy=True)

@@ -151,9 +151,9 @@ class Improved_Network(object):
             new_biases = [nb+dnb for nb, dnb in zip(new_biases, delta_b)] 
             new_weights = [nw+dnw for nw, dnw in zip(new_weights, delta_w)]
         self.weights = [(1-learning_rate*(lmbda/n))*w-(learning_rate/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, new_weights)]  # apply the rule to move the weights to the local minimum, this time using lambda as well (v -> v' = v - η∇C)
+                        for w, nw in zip(self.weights, new_weights)]  # apply the rule to move the weights to the local minimum, this time using lambda as well (v -> v' = v - η∇C). Also applying L2 regularization
         self.biases = [b-(learning_rate/len(mini_batch))*nb 
-                       for b, nb in zip(self.biases, new_biases)] # apply the rule to move the biases to the local minimum (v -> v' = v - η∇C)
+                       for b, nb in zip(self.biases, new_biases)] # apply the rule to move the biases to the local minimum (v -> v' = v - η∇C). Also applying L2 regularization
 
     def backprop(self, x, y):
         """Return a tuple '(new_biases, new_weights)' representing the
