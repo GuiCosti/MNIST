@@ -38,6 +38,7 @@ class Improved_Network(object):
         self.sizes = sizes
         self.improved_weight_initializer()
         self.cost=cost
+        self.improvements_from_last_n_epochs=[]
     
     def improved_weight_initializer(self):
         """Improved initialization with each weight using a Gaussian 
@@ -136,6 +137,27 @@ class Improved_Network(object):
                 print (F"Accuracy on evaluation data: {self.accuracy(evaluation_data)} / {n_data} (" + "{:.1%}".format(accuracy/n_data) + ")")
             print
         return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
+    
+    def stochastic_gradient_descent_early_stopping(
+            self,
+            training_data,
+            epochs,
+            mini_batch_size,
+            learning_rate,
+            lmbda = 0.0,
+            evaluation_data=None,
+            monitor_evaluation_cost=False,
+            monitor_evaluation_accuracy=False,
+            monitor_training_cost=False,
+            monitor_training_accuracy=False,
+            no_improvements_in_epochs=10):
+        """Modified stochastic gradiente descent method that uses the
+        Early Stopping Strategy to determinate the 'best' number of epochs.
+        Basically, the 'no_improvements_in_epochs' parameter is going to
+        determinate the number of epochs that you going to monitor before
+        stopping to train the network."""
+
+        training_data, evaluation_data = convert_zip_data(training_data, evaluation_data) # Fixing python 3 problem with zip returning object
 
     def update_mini_batch(self, mini_batch, learning_rate, lmbda, n):
         """Update the network's weights and biases by applying gradient

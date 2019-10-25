@@ -94,3 +94,18 @@ def threshold_learning_rate(training_data, validation_data, net: neural_network_
                             lmbda = 1.0,
                             evaluation_data=validation_data,
                             monitor_evaluation_accuracy=True)
+
+def early_stopping_strategy(training_data, validation_data, test_data):
+    """Early Stopping Strategy: To determinate a good value for the number of epochs, we need discover the
+    value that the network stops learning. As we've seen, the accuracy can jump around quite a bit, even
+    when the overall trend is to improve. If we stop the first time the accuracy decreases then we'll almost
+    certainly stop when there are more improvements to be had. A better rule is to terminate if the best 
+    classification accuracy doesn't improve for quite some time. Determinate a good initial number of epochs
+    that your network didn't improved (ex: no-improvement-in-ten) and than try a different set 
+    (ex: no-improvement-in-twenty, no-improvement-in-fifty, and so on...) when you better understand the way
+    your network trains.
+    
+    Similarly, for problems other than MNIST, the no-improvement-in-ten rule may be much
+    too aggressive or not nearly aggressive enough, depending on the details of the problem. However, with a 
+    little experimentation it's usually easy to find a pretty good strategy for early stopping."""
+    pass
