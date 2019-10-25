@@ -23,7 +23,11 @@ def hyper_parameters():
 
 
     # Board Strategy
-    board_strategy(training_data, validation_data, test_data)
+    # board_strategy(training_data, validation_data, test_data)
+
+    # Learning Rate Strategy
+    # learning_rate_strategy(training_data, validation_data, test_data)
+
 
 def board_strategy(training_data, validation_data, test_data):
     """Broad Strategy: When using neural networks to attack a new problem the first challenge
@@ -65,3 +69,28 @@ def reduced_training_set(training_data, validation_data, net: neural_network_imp
                                     lmbda=0.1,
                                     evaluation_data=validation_data[:100],
                                     monitor_evaluation_accuracy=True)
+
+def learning_rate_strategy(training_data, validation_data, test_data):
+    """Learning Rate Strategy: To get a good learning rate parameter, we need to find a value that constantly
+    deacreses over the epocs. Choosing a small value can cause a slow stochastic gradiente descent problem as
+    well. A good approach is to start with an greater value, to go down fast into the ideal value, and than
+    start to decrease the leaning rate so it can't 'climb up' the function graph. The first approach that can
+    be used is to find the threshold where the learning rate starts decreasing. Following this procedure will
+    give us an order of magnitude estimate for the threshold value of learning rate. The values of learning
+    rate you should use should SMALLER than your threshold value."""
+
+    net = neural_network_improved.Improved_Network([784, 10])
+
+    threshold_learning_rate(training_data, validation_data, net, 0.025) # Learning rate = 0.025
+    threshold_learning_rate(training_data, validation_data, net, 0.25) # Learning rate = 0.25
+    threshold_learning_rate(training_data, validation_data, net, 2.5) # Learning rate = 2.5
+
+def threshold_learning_rate(training_data, validation_data, net: neural_network_improved.Improved_Network, learning_rate):
+    """Apply the stochastic gradient descent with various learning rates"""
+    net.stochastic_gradient_descent(training_data,
+                            30,
+                            10,
+                            learning_rate,
+                            lmbda = 1.0,
+                            evaluation_data=validation_data,
+                            monitor_evaluation_accuracy=True)
