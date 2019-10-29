@@ -28,6 +28,8 @@ def hyper_parameters():
     # Learning Rate Strategy
     # learning_rate_strategy(training_data, validation_data, test_data)
 
+    # Early Stopping Strategy
+    early_stopping_strategy(training_data, validation_data, test_data)
 
 def board_strategy(training_data, validation_data, test_data):
     """Broad Strategy: When using neural networks to attack a new problem the first challenge
@@ -108,4 +110,17 @@ def early_stopping_strategy(training_data, validation_data, test_data):
     Similarly, for problems other than MNIST, the no-improvement-in-ten rule may be much
     too aggressive or not nearly aggressive enough, depending on the details of the problem. However, with a 
     little experimentation it's usually easy to find a pretty good strategy for early stopping."""
-    pass
+
+    net = neural_network_improved.Improved_Network([784, 10])
+
+    early_stopping(training_data, 30, validation_data, net, 0.25, 1.0, 10)
+    
+def early_stopping(training_data, mini_batch_size, validation_data, net: neural_network_improved.Improved_Network, learning_rate, lmbda, no_improvements_in_epochs):
+    """Apply the stochastic gradient descent early stopping with different parameters sets."""
+    return net.stochastic_gradient_descent_early_stopping(
+        training_data=training_data,
+        mini_batch_size=mini_batch_size,
+        learning_rate=learning_rate,
+        lmbda=lmbda,
+        evaluation_data=validation_data,
+        no_improvements_in_epochs=no_improvements_in_epochs)
