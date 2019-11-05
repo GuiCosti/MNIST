@@ -239,7 +239,7 @@ class Improved_Network(object):
         evaluation_cost, evaluation_accuracy = [], [] # create 2 arrays to hold evaluation cost and accuracy
         training_cost, training_accuracy = [], [] # create 2 arrays to hold training cost and accuracy
         epochs_since_last_best_score = 0 # this number will keep the number of epochs since the last best score
-        learning_rate_stopping_value = learning_rate / (learning_rate_reducing_factor * 10) # learning rate 10 times lower than the initial value. It will be used to stop the algorithm
+        learning_rate_stopping_value = learning_rate / (learning_rate_reducing_factor ** 10) # learning rate 10 times lower than the initial value. It will be used to stop the algorithm
         epoch = 1 # epochs iterator
 
         while epoch < max_epochs: # iterate over the epochs (Note: 10.000 was created for not running infinitely while discovering the best number of epochs)
@@ -264,7 +264,7 @@ class Improved_Network(object):
             
             # Learning rate scheduler logic
             accuracy_rate = accuracy/n
-            if (learning_rate == learning_rate_stopping_value):
+            if (learning_rate <= learning_rate_stopping_value):
                 print(F"Best Score {accuracy_rate * 100}% with learning rate scheduler using factor: {learning_rate_reducing_factor}")
                 return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
             if (accuracy_rate <= self.best_score):
@@ -273,11 +273,11 @@ class Improved_Network(object):
                 self.best_score = accuracy_rate
                 epochs_since_last_best_score = 0
             if (epochs_since_last_best_score >= no_improvements_in_epochs):
-                print(F"Learning rate changed from {round(learning_rate, 4)} to {round(learning_rate ** 1/2, 4)} (Stopes on {round(learning_rate_stopping_value, 4)})")
+                print(F"Learning rate changed to {round(learning_rate ** 1/2, 4)} (Previous: {round(learning_rate, 4)}) (Stopes on {round(learning_rate_stopping_value, 4)})")
                 epochs_since_last_best_score = 0
                 learning_rate = learning_rate / learning_rate_reducing_factor
 
-            print (F"Accuracy on training data: {accuracy} / {n} (" + "{:.1%}".format(accuracy/n) + ") - Epochs since last best score: {epochs_since_last_best_score}")
+            print (F"Accuracy on training data: {accuracy} / {n} (" + "{:.1%}".format(accuracy/n) + ")", F" - Epochs since last best score: {epochs_since_last_best_score}")
         
             if monitor_evaluation_cost:
                 cost = self.total_cost(evaluation_data, lmbda, convert=True)
