@@ -21,7 +21,6 @@ def hyper_parameters():
     validation_data = list(validation_data)
     test_data = list(test_data)
 
-
     # Board Strategy
     # board_strategy(training_data, validation_data, test_data)
 
@@ -29,7 +28,10 @@ def hyper_parameters():
     # learning_rate_strategy(training_data, validation_data, test_data)
 
     # Early Stopping Strategy
-    early_stopping_strategy(training_data, validation_data, test_data)
+    #early_stopping_strategy(training_data, validation_data, test_data)
+
+    # Learning Rate Scheduler Strategy
+    learning_rate_scheduler_strategy(training_data, validation_data, test_data)
 
 def board_strategy(training_data, validation_data, test_data):
     """Broad Strategy: When using neural networks to attack a new problem the first challenge
@@ -124,3 +126,34 @@ def early_stopping(training_data, mini_batch_size, validation_data, net: neural_
         lmbda=lmbda,
         evaluation_data=validation_data,
         no_improvements_in_epochs=no_improvements_in_epochs)
+
+def learning_rate_scheduler_strategy(training_data, validation_data, test_data):
+    """Learning Rate Scheduler Strategy: We've been holding the learning rate η constant.
+    However, it's often advantageous to vary the learning rate. The idea is to hold the 
+    learning rate constant until the validation accuracy starts to get worse. Then decrease 
+    the learning rate by some amount, say a factor of two or ten. We repeat this many times,
+    until, say, the learning rate is a factor of 1,024 (or 1,000) times lower than the initial
+    value. Then we terminate."""
+    net = neural_network_improved.Improved_Network([784, 10])
+
+    learning_rate_scheduler(training_data, 30, validation_data, net, 1.0, 1.0, 4, 2) # learning_rate = 1, no_improvements_in_epochs = 4, learning_rate_reducing_factor = 2
+
+def learning_rate_scheduler(
+    training_data,
+    mini_batch_size,
+    validation_data,
+    net: neural_network_improved.Improved_Network,
+    learning_rate,
+    lmbda,
+    no_improvements_in_epochs,
+    learning_rate_reducing_factor,
+    max_epochs=10000):
+    return net.stochastic_gradient_descent_learning_rate_schedule(
+        training_data=training_data,
+        mini_batch_size=mini_batch_size,
+        learning_rate=learning_rate,
+        lmbda=lmbda,
+        evaluation_data=validation_data,
+        no_improvements_in_epochs=no_improvements_in_epochs,
+        learning_rate_reducing_factor=learning_rate_reducing_factor,
+        max_epochs=max_epochs)

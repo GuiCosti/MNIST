@@ -211,6 +211,87 @@ class Improved_Network(object):
             epoch += 1 # Add one epoch
         return epoch
 
+    def stochastic_gradient_descent_learning_rate_schedule(
+            self,
+            training_data,
+            mini_batch_size,
+            learning_rate,
+            lmbda = 0.0,
+            evaluation_data=None,
+            monitor_evaluation_cost=False,
+            monitor_evaluation_accuracy=False,
+            monitor_training_cost=False,
+            no_improvements_in_epochs=4,
+            learning_rate_reducing_factor=2,
+            max_epochs=10000):
+        """Modified stochastic gradiente descent method that uses the
+        Learning Rate Schedule Strategy to improve the way learning rate
+        affects the training. The idea is to hold the learning rate constant
+        until the validation accuracy starts to get worse. Then decrease the
+        learning rate by some amount, say a factor of two or ten. We repeat
+        this many times, until, say, the learning rate is a factor of 1,024
+        (or 1,000) times lower than the initial value. Then we terminate."""
+
+        training_data, evaluation_data = convert_zip_data(training_data, evaluation_data) # Fixing python 3 problem with zip returning object
+
+        if evaluation_data: n_data = len(evaluation_data) # check if exists an evaluation_data.
+        n = len(training_data) # attribute the length of training data to n.
+        evaluation_cost, evaluation_accuracy = [], [] # create 2 arrays to hold evaluation cost and accuracy
+        training_cost, training_accuracy = [], [] # create 2 arrays to hold training cost and accuracy
+        epochs_since_last_best_score = 0 # this number will keep the number of epochs since the last best score
+        learning_rate_stopping_value = learning_rate_reducing_factor ** 1/10 # learning rate 10 times lower than the initial value. It will be used to stop the algorithm
+        epoch = 1 # epochs iterator
+
+        while epoch < max_epochs: # iterate over the epochs (Note: 10.000 was created for not running infinitely while discovering the best number of epochs)
+
+            random.shuffle(training_data) # shuffle the training data to avoid biases on networking training
+            mini_batches = [
+                training_data[k:k+mini_batch_size]
+                for k in range(0, n, mini_batch_size)] # creates the mini-batches based on mini_batch_size, from the training_data
+
+            for mini_batch in mini_batches: # iterate over the mini-batches
+                self.update_mini_batch(mini_batch, learning_rate, lmbda, len(training_data)) # update the current mini-batch weights and biases based on learning rate
+            print (F"Epoch {epoch} training complete")
+
+            if monitor_training_cost:
+                cost = self.total_cost(training_data, lmbda)
+                training_cost.append(cost)
+                print (F"Cost on training data: {cost}")
+
+            # Training accuracy becomes required on this type of training
+            accuracy = self.accuracy(training_data, convert=True)
+            training_accuracy.append(accuracy)
+            
+            # Learning rate scheduler logic
+            accuracy_rate = accuracy/n
+            if (learning_rate == learning_rate_stopping_value):
+                print(F"Best Score {accuracy_rate * 100}% with learning rate scheduler using factor: {learning_rate_reducing_factor}")
+                return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
+            if (accuracy_rate <= self.best_score):
+                epochs_since_last_best_score += 1
+            else:
+                self.best_score = accuracy_rate
+                epochs_since_last_best_score = 0
+            if (epochs_since_last_best_score >= no_improvements_in_epochs):
+                epochs_since_last_best_score = 0
+                learning_rate = learning_rate ** 1/2
+
+            print (F"Accuracy on training data: {accuracy} / {n} (" + "{:.1%}".format(accuracy/n) + ")")
+            print (F"Epochs since last best score: {epochs_since_last_best_score}")
+        
+            if monitor_evaluation_cost:
+                cost = self.total_cost(evaluation_data, lmbda, convert=True)
+                evaluation_cost.append(cost)
+                print (F"Cost on evaluation data: {cost}")
+
+            if monitor_evaluation_accuracy:
+                accuracy = self.accuracy(evaluation_data)
+                evaluation_accuracy.append(accuracy)
+                print (F"Accuracy on evaluation data: {self.accuracy(evaluation_data)} / {n_data} (" + "{:.1%}".format(accuracy/n_data) + ")")
+            print
+            epoch += 1 # Add one epoch
+        return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
+
     def update_mini_batch(self, mini_batch, learning_rate, lmbda, n):
         """Update the network's weights and biases by applying gradient
         descent using backpropagation to a single mini batch. The
