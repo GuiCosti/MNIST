@@ -1,5 +1,5 @@
 ## About
-Apply deep leaning algorithms over MNIST handwritten digits database, using Python 3.
+Apply deep learning algorithms over MNIST handwritten digits database, using pure Python 3 (no Deep Learning library).
 
 ## Requirements
 - python (3.7.4)
